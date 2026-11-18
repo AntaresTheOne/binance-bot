@@ -1,0 +1,5 @@
+# Python 3.12+. Установка: uv venv .venv && uv pip install --python .venv/Scripts/python.exe -r requirements.txt
+# Название freqtrade пишите точно: в PyPI есть вредоносные пакеты с похожими именами.
+freqtrade==2026.10
+anthropic==2.10.0
+feedparser==6.0.14

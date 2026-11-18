@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+
+# секреты: ключи биржи и Telegram храним только здесь
+.env
+user_data/config.private.json
+
+# данные и результаты, которые можно скачать или пересчитать заново
+user_data/data/
+user_data/backtest_results/
+user_data/hyperopt_results/
+user_data/logs/
+user_data/*.sqlite*
+user_data/news_state.json
