@@ -38,6 +38,8 @@
 | `user_data/strategies/trend_news_guard.py` | Стратегии `VoteTrend` (основная) и `TrendNewsGuard` (первая, для сравнения), общий код новостного вето |
 | `user_data/config.json` | Конфиг Freqtrade: тестовый режим, 1000 виртуальных USDT, без ключей |
 | `user_data/config.data-mirror.json` | Надстройка: рыночные данные через официальное зеркало Binance `data-api.binance.vision` |
+| `user_data/config.testnet.json` | Надстройка для тестовой биржи Binance и пробной стратегии `TestnetProbe` |
+| `user_data/config.private.example.json` | Шаблон файла с ключами; сами ключи хранятся в `config.private.json` вне git |
 | `news_guard/` | Новостной модуль: сбор (`sources.py`), оценка (`scorer.py`), правила вето (`rules.py`), хранилище (`store.py`) |
 | `research/scan.py` | Стенд для сравнения стратегий на периоде разработки и контрольном периоде |
 | `tests/` | Тесты новостного модуля и его связи со стратегией |
@@ -99,6 +101,29 @@ uv pip install --python .venv/Scripts/python.exe -r requirements.txt
 
 ```bash
 .venv/Scripts/python.exe -m unittest discover -s tests
+```
+
+## Проверка на тестовой бирже Binance
+
+Binance Spot Testnet принимает настоящие ордера на выдуманные деньги. Цены и ликвидность там искусственные, балансы периодически сбрасываются, поэтому прибыльность на ней не оценивают — она нужна, чтобы проверить связь робота с биржей.
+
+Для этого есть пробная стратегия `TestnetProbe` (`user_data/strategies/testnet_probe.py`): она покупает BTC на 50 тестовых USDT рыночным ордером, ставит стоп на бирже, через 3 минуты продаёт и больше не входит. На реальном счёте она отказывается стартовать.
+
+1. Войдите на https://testnet.binance.vision через GitHub и создайте ключ (Generate HMAC-SHA-256 Key).
+2. Скопируйте `user_data/config.private.example.json` в `user_data/config.private.json` и впишите туда ключ и секрет. Этот файл исключён из git.
+3. Синхронизируйте часы компьютера: при расхождении со временем биржи больше нескольких секунд запросы с ключом отклоняются.
+4. Запустите пробу:
+
+```bash
+.venv/Scripts/freqtrade.exe trade --userdir user_data --config user_data/config.json --config user_data/config.testnet.json --config user_data/config.private.json --logfile user_data/logs/testnet.log
+```
+
+В журнале должны появиться покупка, стоп-ордер на бирже и через 3 минуты продажа. Остановка — Ctrl+C. Чтобы повторить пробу, удалите `user_data/tradesv3.testnet.sqlite`.
+
+Та же проба без ключей, в режиме имитации на данных тестовой биржи:
+
+```bash
+.venv/Scripts/freqtrade.exe trade --dry-run --userdir user_data --config user_data/config.json --config user_data/config.testnet.json --db-url sqlite:///user_data/tradesv3.probe-check.sqlite
 ```
 
 ## Доступ к Claude

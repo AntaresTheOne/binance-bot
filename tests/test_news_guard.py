@@ -266,5 +266,36 @@ class StrategyIntegrationTest(unittest.TestCase):
             self.assertIsNotNone(self.block_reason(tmp, "BTC/USDT", NOW))
 
 
+class TestnetProbeGuardTest(unittest.TestCase):
+    """Пробная стратегия не должна стартовать на реальном счёте."""
+
+    @classmethod
+    def setUpClass(cls):
+        spec = importlib.util.spec_from_file_location(
+            "testnet_probe", ROOT / "user_data" / "strategies" / "testnet_probe.py"
+        )
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        cls.probe = module.TestnetProbe
+
+    def start(self, config):
+        self.probe.bot_start(SimpleNamespace(config=config))
+
+    def test_refuses_real_account(self):
+        from freqtrade.exceptions import OperationalException
+
+        for config in (
+            {"dry_run": False, "exchange": {}},
+            {"dry_run": False, "exchange": {"ccxt_config": {"sandbox": False}}},
+            {"dry_run": False, "exchange": {"ccxt_config": {"sandbox": "true"}}},  # строка, а не true
+        ):
+            with self.assertRaises(OperationalException):
+                self.start(config)
+
+    def test_allows_testnet_and_dry_run(self):
+        self.start({"dry_run": False, "exchange": {"ccxt_config": {"sandbox": True}}})
+        self.start({"dry_run": True, "exchange": {}})
+
+
 if __name__ == "__main__":
     unittest.main()

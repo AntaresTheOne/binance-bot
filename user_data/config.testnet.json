@@ -1,0 +1,26 @@
+{
+  "bot_name": "binance_testnet_probe",
+  "strategy": "TestnetProbe",
+
+  "dry_run": false,
+  "db_url": "sqlite:///user_data/tradesv3.testnet.sqlite",
+
+  "max_open_trades": 1,
+  "stake_amount": 50,
+
+  "entry_pricing": { "price_side": "other" },
+  "exit_pricing": { "price_side": "other" },
+
+  "exchange": {
+    "enable_ws": false,
+    "ccxt_config": {
+      "sandbox": true,
+      "options": { "fetchMarkets": { "types": ["spot"] } }
+    },
+    "ccxt_async_config": {
+      "sandbox": true,
+      "options": { "fetchMarkets": { "types": ["spot"] } }
+    },
+    "pair_whitelist": ["BTC/USDT"]
+  }
+}
