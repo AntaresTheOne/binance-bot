@@ -5,6 +5,7 @@ __pycache__/
 # секреты: ключи биржи и Telegram храним только здесь
 .env
 user_data/config.private.json
+user_data/config.telegram.json
 
 # данные и результаты, которые можно скачать или пересчитать заново
 user_data/data/
